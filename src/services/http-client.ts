@@ -4,18 +4,12 @@ const extractJson = (res: any) => {
     return res.json();
 }
 
-// axios
-// const http = axios;
-// const extractJson = (res: any) => {
-//     return res.data;
-// }
-
 interface IHttpClient {
     request(url: string, options?: RequestInit): Promise<any>;
     extractData(res: Response): any;
 }
 
-const BASE_URL = 'http://localhost:3000/'
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 class HttpClient implements IHttpClient {
     async request(url: string, options = {}): Promise<any> {

@@ -60,7 +60,7 @@ const PixKeyValidation: React.FC = () => {
         setPixKey({ ...pixKey, type: selectedType });
         console.log(pixKey.value, e.target.value);
         if (validKeys!.length >= 1 && selectedType && pixKey.value) {
-            fetch("http://localhost:3000/user/pixKey", {
+            fetch(BASE_URL + "user/pixKey", {
                 method: 'POST',
                 body: JSON.stringify({ value: pixKey.value, type: selectedType }),
                 headers: {

@@ -8,6 +8,8 @@ import MyTransactionsScreen from './pages/my-transactions';
 import NotFoundScreen from './pages/not-founded';
 
 const App = () => {
+  const { REACT_APP_API_URL } = process.env;
+  console.log(REACT_APP_API_URL)
   return (
     <Provider store={store}>
       <Router>

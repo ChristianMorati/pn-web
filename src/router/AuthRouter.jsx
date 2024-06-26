@@ -9,8 +9,9 @@ export default function AuthRouter() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="" element={<HomeScreen />} />
-        <Route path="/my-transactions" element={<MyTransactionsScreen />} />
+      <Route path="/" element={<AuthScreen />} />
+        <Route path="my-account" element={<HomeScreen />} />
+        <Route path="my-transactions" element={<MyTransactionsScreen />} />
       </Routes>
     </Router>
   );

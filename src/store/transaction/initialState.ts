@@ -4,6 +4,8 @@ export type TransactionItem = {
     payerUserId: number,
     payeePixKey: string,
     accountId: number,
+    payeePixKeyType: string
+    type: string
     date: Date,
     success?: boolean
 }

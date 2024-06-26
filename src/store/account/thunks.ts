@@ -17,7 +17,7 @@ export const loadMyAccountData = createAsyncThunk(
 
             const userData = JSON.parse(user);
 
-            const response = await httpClient.request(`account/${userData.user.id}`, {
+            const response = await httpClient.request(`account/user/${userData.user.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -29,7 +29,6 @@ export const loadMyAccountData = createAsyncThunk(
 
             return response;
         } catch (error) {
-            console.log(error);
             return Promise.reject({ message: "Falha ao carregar os dados da conta" });
         }
     }

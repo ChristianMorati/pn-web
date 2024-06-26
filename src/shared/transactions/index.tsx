@@ -3,6 +3,9 @@ import { themeColors } from "../../theme/colors";
 import { formatToCurrencyBRL, formatToDateBRL } from "../../utils";
 import { ContainerGradient } from "../../styled-components/containers";
 import { TransactionItem } from "../../store/transaction/initialState";
+import { useAppSelector } from "../../store/hooks/useAppSelector";
+import { PixKey } from "../../store/account/initialState";
+import RefundTransactionButton from "../refund-button";
 
 interface TransactionsProps {
     myTransactions: TransactionItem[];
@@ -17,6 +20,8 @@ export default function Transactions({
     loadMyTransactionsError,
     handleReload
 }: TransactionsProps) {
+    const { account } = useAppSelector(store => store.account);
+
     return (
         <>
             {loadMyTransactionsStatus === 'loading' && (
@@ -40,42 +45,101 @@ export default function Transactions({
                         <p className="pt-2 font-medium text-xl mb-2" style={{ color: themeColors.color }}>Minhas Transações</p>
                         {myTransactions.length > 0 ? (
                             <>
-                                {myTransactions.map(transaction => (
-                                    <div
-                                        key={transaction.id}
-                                    >
-                                        <ContainerGradient>
-                                            <p className="font-bold text-right" style={{ color: themeColors.color }}>
-                                                {formatToDateBRL(transaction.date)}
-                                            </p>
-
-                                            <div className="flex justify-between pt-2">
-                                                <p className="font-semibold" style={{ color: transaction.payeePixKey ? themeColors.error : themeColors.success }}>
-                                                    {transaction.payeePixKey == null ? "Adição de Saldo" : "Transferência"}
+                                {myTransactions.map(transaction => {
+                                    const keys: PixKey[] = account.pixKeys || [];
+                                    const isAdd = keys.some((pixKey: PixKey) => pixKey.value === transaction.payeePixKey);
+                                    return (
+                                        <div key={transaction.id}>
+                                            <ContainerGradient>
+                                                <p className="font-bold text-right" style={{ color: themeColors.color }}>
+                                                    {formatToDateBRL(transaction.date)}
                                                 </p>
-                                                {transaction.payeePixKey ? (
-                                                    <p className="font-bold text-right" style={{ color: themeColors.error }}>
-                                                        <i className="fa fa-arrow-trend-down" aria-hidden="true"></i>{` -${formatToCurrencyBRL(transaction.amount)}`}
-                                                    </p>
-                                                ) : (
-                                                    <p className="font-bold text-right" style={{ color: themeColors.success }}>
-                                                        <i className="fa fa-arrow-trend-up" aria-hidden="true"></i>{` +${formatToCurrencyBRL(transaction.amount)}`}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </ContainerGradient>
-                                    </div>
-                                ))}
+                                                <p className="font-bold text-right" style={{ color: themeColors.color }}>
+                                                    {isAdd && transaction.type === 'refund' ? "Foi extornada" : null}
+                                                </p>
+                                                <div className="flex-row justify-start py-4">
+                                                    {isAdd && transaction.type === 'transaction' && (
+                                                        <RefundTransactionButton
+                                                            buttonText={"Devolver"}
+                                                            transaction={transaction}
+                                                        />
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-row justify-between pt-2">
+                                                    {transaction.type === 'deposit' && (
+                                                        <>
+                                                            <p className="font-semibold" style={{ color: themeColors.success }}>
+                                                                Depósito
+                                                            </p>
+                                                            <p className="font-bold text-right" style={{ color: themeColors.success }}>
+                                                                <span className="material-icons" style={{ fontSize: '12px' }}>trending_up</span>
+                                                                {` +${formatToCurrencyBRL(transaction.amount)}`}
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                    {account.id === transaction.accountId && transaction.type === 'refund' && (
+                                                        <>
+                                                            <p className="font-semibold" style={{ color: themeColors.success }}>
+                                                                O destinatário extornou
+                                                            </p>
+                                                            <p className="font-bold text-right" style={{ color: themeColors.success }}>
+                                                                <span className="material-icons" style={{ fontSize: '12px' }}>trending_up</span>
+                                                                {` +${formatToCurrencyBRL(transaction.amount)}`}
+                                                            </p>
+                                                        </>
+                                                    )}
+
+                                                    {isAdd && transaction.type === 'refund' && (
+                                                        <>
+                                                            <p className="font-semibold" style={{ color: themeColors.error }}>
+                                                                Você extornou
+                                                            </p>
+                                                            <p className="font-bold text-right" style={{ color: themeColors.error }}>
+                                                                <span className="material-icons" style={{ fontSize: '12px' }}>trending_down</span>
+                                                                {` -${formatToCurrencyBRL(transaction.amount)}`}
+                                                            </p>
+                                                        </>
+                                                    )}
+
+                                                    {isAdd && transaction.type === 'transaction' && (
+                                                        <>
+                                                            <p className="font-semibold" style={{ color: themeColors.success }}>
+                                                                Recebido
+                                                            </p>
+                                                            <p className="font-bold text-right" style={{ color: themeColors.success }}>
+                                                                <span className="material-icons" style={{ fontSize: '12px' }}>trending_up</span>
+                                                                {` +${formatToCurrencyBRL(transaction.amount)}`}
+                                                            </p>
+                                                        </>
+                                                    )}
+
+                                                    {!isAdd && transaction.type === 'transaction' && (
+                                                        <>
+                                                            <p className="font-semibold" style={{ color: themeColors.error }}>
+                                                                Transferência
+                                                            </p>
+                                                            <p className="font-bold text-right" style={{ color: themeColors.error }}>
+                                                                <span className="material-icons" style={{ fontSize: '12px' }}>trending_down</span>
+                                                                {` -${formatToCurrencyBRL(transaction.amount)}`}
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </ContainerGradient>
+                                        </div>
+                                    )
+                                })}
+
                             </>
                         ) : (
-                            <div className="flex flex-col pt-2 px-4 py-6 rounded-t-xl bg-white overflow-hidden">
-                                <div className="bg-gradient-to-r from-secondary to-primary h-20 rounded-t-xl mb-4"></div>
+                            <ContainerGradient lightTop>
                                 <p className="font-bold text-center" style={{ color: themeColors.error }}>Sem Transações</p>
-                            </div>
+                            </ContainerGradient>
                         )}
-                    </div>
-                </div>
-            )}
+                    </div >
+                </div >
+            )
+            }
         </>
     );
 };

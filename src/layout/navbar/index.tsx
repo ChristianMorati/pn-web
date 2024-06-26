@@ -15,9 +15,9 @@ export default function Navbar() {
 
             {/* Botões à direita */}
             <div className="flex items-center space-x-4">
-                <Link to={"auth"} onClick={() => dispatch(logOff())} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Login</Link>
-                <Link to={"auth"} onClick={() => dispatch(logOff())} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Signup</Link>
-                <Link to={"auth"} onClick={() => dispatch(logOff())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">Sair</Link>
+                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Login</Link>
+                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Signup</Link>
+                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">Sair</Link>
             </div>
         </nav>
     );

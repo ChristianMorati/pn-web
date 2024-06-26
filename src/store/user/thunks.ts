@@ -1,13 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { httpClient } from "../../services/http-client";
-import { UserInfo } from "./initialState";
+import { BASE_URL } from "../../services/http-client";
 
 type UserLogin = {
     username: string,
     password: string
 }
 
-type userSignUp = {
+type UserSignUp = {
     name: string,
     username: string,
     password: string,
@@ -15,10 +14,31 @@ type userSignUp = {
 }
 
 export const loginAsync = createAsyncThunk(
-    "login/login",
+    "user/login",
     async (formData: UserLogin) => {
+        const response = await fetch(BASE_URL + 'auth/signin', {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to login');
+        }
+
+        return data;
+    }
+);
+
+export const signUpAsync = createAsyncThunk(
+    "user/signup",
+    async (formData: UserSignUp, { rejectWithValue }) => {
         try {
-            const response = await httpClient.request(`auth/signin`, {
+            const response = await fetch(BASE_URL + 'auth/signup', {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {
@@ -26,38 +46,15 @@ export const loginAsync = createAsyncThunk(
                 },
             });
 
-            if (response.status === 200) {
-                return response;
-            } else {
-                throw new Error(`Unexpected status code: ${response}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                return rejectWithValue(errorData.message || 'Failed to Create account');
             }
 
+            const data = await response.json();
+            return data;
         } catch (error) {
-            throw error;
-        }
-    }
-);
-
-export const signUpAsync = createAsyncThunk(
-    "login/signup",
-    async (formData: userSignUp) => {
-        try {
-            const response = await httpClient.request(`auth/signup`, {
-                method: "POST",
-                body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-
-            if (response.status === 201) {
-                return response;
-            } else {
-                throw new Error(`Unexpected status code: ${response}`);
-            }
-
-        } catch (error) {
-            throw error;
+            return rejectWithValue('Failed to Create account');
         }
     }
 );

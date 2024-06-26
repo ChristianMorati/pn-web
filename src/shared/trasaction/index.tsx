@@ -5,8 +5,8 @@ import { useAppSelector } from '../../store/hooks/useAppSelector';
 import { createTransaction } from '../../store/transaction/thunks';
 import { withdraw } from '../../store/account/actions';
 import { TransactionItem } from '../../store/transaction/initialState';
-import { userService } from '../../services/user-service'; // Import the user service
 import { addTransaction } from '../../store/transaction/actions';
+import { BASE_URL } from '../../services/http-client';
 
 // Definição dos tipos
 type PixKeyType = 'email' | 'cpf' | 'cnpj' | 'phone' | 'random';
@@ -37,7 +37,7 @@ const PixKeyValidation: React.FC = () => {
     const [pixKey, setPixKey] = useState<{ value: string | null, type: PixKeyType | null }>({ value: '', type: null });
     const [amount, setAmount] = useState<string>('');
     const [validKeys, setValidKeys] = useState<PixKeyType[] | null>([]);
-    const [userName, setUserName] = useState<string | null>(null); // State to store user name
+    const [userName, setUserName] = useState<string | null>(null);
     const [messages, setMessages] = useState<{ error: null | string, success: null | string }>({
         error: null,
         success: null,
@@ -49,26 +49,33 @@ const PixKeyValidation: React.FC = () => {
     const handlePixKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
         const key: string = e.target.value;
         const validKeys: PixKeyType[] = keys.filter(({ regex }) => regex.test(key)).map(({ type }) => type);
-        setPixKey({ value: key, type: null }); // Resetar tipo de chave e valor
-        setValidKeys(validKeys); // Atualizar validKeys
-        setUserName(null); // Limpar nome do usuário
-        setMessages({ error: null, success: null }); // Limpar mensagens de erro/sucesso
+        setPixKey({ value: key, type: null });
+        setValidKeys(validKeys);
+        setUserName(null);
+        setMessages({ error: null, success: null });
     };
 
     const handlePixKeyTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const selectedType: PixKeyType = e.target.value as PixKeyType;
         setPixKey({ ...pixKey, type: selectedType });
+        console.log(pixKey.value, e.target.value);
         if (validKeys!.length >= 1 && selectedType && pixKey.value) {
-            userService.findUserByPixKey(pixKey.value)
+            fetch("http://localhost:3000/user/pixKey", {
+                method: 'POST',
+                body: JSON.stringify({ value: pixKey.value, type: selectedType }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(res => res.json())
                 .then(user => {
-                    console.log(user.name);
                     if (!user.name) {
                         throw new Error("Usuário não encontrado");
                     }
+                    console.log(user);
                     setUserName(user.name);
                     setStep(2);
-                }).catch(() => {
-                    console.log('dbhdcb');
+                }).catch((e) => {
                     setPixKey({ value: null, type: null });
                     setMessages({
                         error: 'Ocorreu um erro ao buscar o usuário. Tente novamente mais tarde.',
@@ -90,7 +97,7 @@ const PixKeyValidation: React.FC = () => {
 
     const isValidAmount = (value: string) => {
         const parsed = convertToFloat(value);
-        return !isNaN(parsed) && parsed > 0.50;
+        return !isNaN(parsed) && parsed >= 0.50;
     };
 
     const handleSubmit = async () => {
@@ -105,7 +112,11 @@ const PixKeyValidation: React.FC = () => {
                     return;
                 }
 
-                const transaction: TransactionItem = await dispatch(createTransaction({ amount: parsedAmount, payeePixKey: pixKey.value })).unwrap();
+                const transaction: TransactionItem = await dispatch(createTransaction({
+                    amount: parsedAmount,
+                    payeePixKey: pixKey.value,
+                    payeePixKeyType: pixKey.type
+                })).unwrap();
 
                 if (!transaction) {
                     throw new Error("Erro ao efetuar a transação");

@@ -23,7 +23,6 @@ const loginAsyncBuilder = (
         })
         .addCase(loginAsync.rejected, (state, action) => {
             state.loading = false;
-            alert("Opss!\nverifique as suas credenciais!");
         })
 }
 

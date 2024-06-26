@@ -1,14 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { httpClient } from "../../services/http-client";
+import { TransactionItem } from "./initialState";
 
 type createTransactionParams = {
     amount: number,
     payeePixKey: string
+    payeePixKeyType: string
 }
 
 export const createTransaction = createAsyncThunk(
     'transaction/create',
-    async ({ amount, payeePixKey }: createTransactionParams, { rejectWithValue }) => {
+    async ({ amount, payeePixKey, payeePixKeyType }: createTransactionParams, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('TOKEN');
             if (!token) {
@@ -27,11 +29,39 @@ export const createTransaction = createAsyncThunk(
                 body: JSON.stringify({
                     amount: amount,
                     payerUserId: userData.user.id,
-                    payeePixKey
+                    payeePixKey,
+                    payeePixKeyType
                 }),
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.success) {
+                throw new Error('Failed to create transaction');
+            }
+
+            return response;
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+export const refundTransaction = createAsyncThunk(
+    'transaction/refund',
+    async (transaction: TransactionItem, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('TOKEN');
+            if (!token) {
+                throw new Error('Token not found');
+            }
+
+            const response = await httpClient.request(`transaction/refund`, {
+                method: "POST",
+                body: JSON.stringify(transaction),
+                headers: {
+                    'Content-Type': 'application/json',
                 },
             });
 
@@ -52,12 +82,10 @@ export const loadMyTransactions = createAsyncThunk(
         const { account } = getState()?.account;
 
         try {
-            console.log("loadMyTransactions: ",account)
-            const token = localStorage.getItem('TOKEN');
+            console.log("loadMyTransactions: ", account)
             const response = await httpClient.request(`transaction/all/${account.id}`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
             });
 

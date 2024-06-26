@@ -2,10 +2,11 @@ import React, { useState, ChangeEvent } from 'react';
 import QRCodeGenerator from '../../shared/qrcode-generator';
 import Input from '../../shared/trasaction/input';
 import { TransactionItem } from '../../store/transaction/initialState';
+import { PixKey } from '../../store/account/initialState';
 
 interface QRCodeBillingProps {
     accountId: number;
-    pixKey: string;
+    pixKey: PixKey;
 }
 
 const QRCodeBilling: React.FC<QRCodeBillingProps> = ({ accountId, pixKey }) => {
@@ -33,11 +34,13 @@ const QRCodeBilling: React.FC<QRCodeBillingProps> = ({ accountId, pixKey }) => {
 
     const handleSubmit = () => {
         setError(null);
+        
         if (isValidAmount(amount)) {
             const billing: Partial<TransactionItem> = {
                 amount: parseFloat(amount.replace(/\./g, '').replace(',', '.').replace('R$', '')),
                 accountId,
-                payeePixKey: pixKey
+                payeePixKey: pixKey.value,
+                payeePixKeyType: pixKey.type
             };
             setQrValue(JSON.stringify(billing));
             setConfirmed(true);

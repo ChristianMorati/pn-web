@@ -3,6 +3,7 @@ import Input from '../../shared/trasaction/input';
 import { useAppDispatch } from '../../store/hooks/useAppDispatch';
 import { signUpAsync } from '../../store/user/thunks';
 import { useNavigate } from 'react-router-dom';
+import { setSignedIn } from '../../store/user/actions';
 
 // Função para validar email
 const validateEmail = (email: string): boolean => {
@@ -44,7 +45,7 @@ const SignUp: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    
+
     // Validações em tempo real
     useEffect(() => {
         if (step === 1) {
@@ -84,16 +85,15 @@ const SignUp: React.FC = () => {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setIsSubmitting(true);
         const cleanedCpf = cpf.replace(/\D/g, '');
 
-        dispatch(signUpAsync({ username: email, password, name, cpf: cleanedCpf }
-        )).then((data) => {
-            setSuccess(`Cadastro realizado com sucesso! Dados: ${JSON.stringify(data)}`);
-            navigate("", { replace: true });
-        }).catch(() => {
-            setSuccess(`Erro inesperado:`);
+        dispatch(signUpAsync({ username: email, password, name, cpf: cleanedCpf })).then((data) => {
+            console.log(data)
+            navigate('/');
+        }).catch((e) => {
+            console.log(e);
         })
 
         setIsSubmitting(false);

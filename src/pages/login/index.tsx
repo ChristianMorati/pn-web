@@ -60,18 +60,25 @@ const Login: React.FC = () => {
         setPassword(e.target.value);
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setIsSubmitting(true);
 
-        try {
-            await dispatch(loginAsync({ username: email, password: password }));
-            dispatch(setSignedIn(true));
-            navigate('');
-        } catch (error: any) {
-            console.log("Error to login")
-        } finally {
-            setIsSubmitting(false);
-        }
+        dispatch(loginAsync({ username: email, password: password })).then((data) => {
+            console.log(data)
+            navigate('/');
+        }).catch((e) => {
+        })
+
+
+        // try {
+        //     await dispatch(loginAsync({ username: email, password: password }));
+        //     dispatch(setSignedIn(true));
+        //     navigate('/my-account');
+        // } catch (error: any) {
+        //     console.log("Error to login")
+        // } finally {
+        //     setIsSubmitting(false);
+        // }
     };
 
     return (

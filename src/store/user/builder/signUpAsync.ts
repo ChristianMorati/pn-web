@@ -3,10 +3,6 @@ import { IUserProps } from "../interfaces/IUserProps";
 import { signUpAsync } from "../thunks";
 import { UserInfo } from "../initialState";
 
-type BackEndUSerInfo = {
-
-}
-
 const signUpAsyncBuilder = (
     builder: ActionReducerMapBuilder<IUserProps>,
 ) => {
@@ -20,14 +16,13 @@ const signUpAsyncBuilder = (
             localStorage.setItem('TOKEN', action.payload.access_token);
 
             state.loading = false;
-            // state.signedIn = true;
+            state.signedIn = true;
         })
         .addCase(signUpAsync.pending, (state, action) => {
             state.loading = true;
         })
         .addCase(signUpAsync.rejected, (state, action) => {
             state.loading = false;
-            alert("Opss!\nverifique as suas credenciais!");
         })
 }
 

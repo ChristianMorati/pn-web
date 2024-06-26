@@ -15,10 +15,15 @@ interface IHttpClient {
     extractData(res: Response): any;
 }
 
+const BASE_URL = 'http://localhost:3000/'
+
 class HttpClient implements IHttpClient {
     async request(url: string, options = {}): Promise<any> {
         try {
-            const res = await http("http://192.168.1.41:3000/" + url, options);
+            const res = await http(BASE_URL + url, options);
+            if (!res.ok) {
+                throw new Error(`Request failed with status ${res.status}`);
+            }
             const responseObj = this.extractData(res);
             return responseObj;
         } catch (error) {
@@ -33,4 +38,4 @@ class HttpClient implements IHttpClient {
 }
 
 const httpClient = new HttpClient();
-export { httpClient }
+export { httpClient, BASE_URL }

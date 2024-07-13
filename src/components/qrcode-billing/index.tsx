@@ -1,8 +1,9 @@
 import React, { useState, ChangeEvent } from 'react';
-import QRCodeGenerator from '../../shared/qrcode-generator';
-import Input from '../../shared/trasaction/input';
+import QRCodeGenerator from '../qrcode-generator';
+import Input from '../trasaction/input';
 import { TransactionItem } from '../../store/transaction/initialState';
 import { PixKey } from '../../store/account/initialState';
+import { Title } from '../../styled-components/text';
 
 interface QRCodeBillingProps {
     accountId: number;
@@ -60,7 +61,7 @@ const QRCodeBilling: React.FC<QRCodeBillingProps> = ({ accountId, pixKey }) => {
     return (
         <div>
             <p className='text-left p-2 bg-orange-200 text-orange-600 font-bold'>Somente usuários PIXNODE</p>
-            <h1 className="text-2xl my-4 text-white">Gerar cobrança QR</h1>
+            <Title>Gerar cobrança QR</Title>
             {error && <div className="p-2 bg-red-600 font-bold text-red-50 mt-2">{error}</div>}
             <div className='flex flex-col justify-center items-center'>
                 {!confirmed ? (

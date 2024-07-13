@@ -2,13 +2,15 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAppSelector } from '../../store/hooks/useAppSelector';
 import { useAppDispatch } from '../../store/hooks/useAppDispatch';
 import { loadMyAccountData } from '../../store/account/thunks';
-import MyAccount from '../../shared/my-account';
+import MyAccount from '../../components/my-account';
 import { ContainerGradient } from '../../styled-components/containers';
-import Transactions from '../../shared/transactions';
+import Transactions from '../../components/transactions';
 import { loadMyTransactions } from '../../store/transaction/thunks';
-import QRCodeBilling from '../../shared/qrcode-billing';
+import QRCodeBilling from '../../components/qrcode-billing';
 import './index.css';
-import PixKeyValidation from '../../shared/trasaction';
+import PixKeyValidation from '../../components/trasaction';
+import { TransactionObservable } from '../../sse/transaction';
+import AddBalance from '../../components/add-balance';
 
 const HomeScreen: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -35,6 +37,20 @@ const HomeScreen: React.FC = () => {
         }
     }, [dispatch, userInfo]);
 
+    useEffect(() => {
+        var transactionObservable: TransactionObservable;
+        if (userInfo.user.username) {
+            transactionObservable = new TransactionObservable({ userId: userInfo.user.id });
+            transactionObservable.listenToIncomingTransaction();
+        }
+
+        return () => {
+            if (transactionObservable) {
+                transactionObservable.stopListeningToIncomingTransaction();
+            }
+        };
+    }, []);
+
     const handleAccountReload = useCallback(() => {
         dispatch(loadMyAccountData());
     }, [dispatch]);
@@ -48,10 +64,12 @@ const HomeScreen: React.FC = () => {
     return (
         <>
             {loading ? (
-                <p>Loading...</p>
+                <div className='h-[100vh] w-[100vw] grid place-items-center'>
+                    <div className="loader" />
+                </div>
             ) : (
                 <div className='p-2 flex-col gap-2 w-[100%] md:w-[90%] lg:w-[70%] mx-auto' style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <ContainerGradient className='w-[100%] h-[150px]'>
+                    <ContainerGradient className='w-[100%]'>
                         <MyAccount
                             account={account} error={accountError} status={accountStatus || ""} handleReload={handleAccountReload}
                         />
@@ -76,8 +94,11 @@ const HomeScreen: React.FC = () => {
                                 />
                             </ContainerGradient>
                         )}
-                    </div>
-                </div>
+                        <ContainerGradient>
+                            <AddBalance />
+                        </ContainerGradient>
+                    </div >
+                </div >
             )}
         </>
     );

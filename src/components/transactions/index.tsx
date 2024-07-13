@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { themeColors } from "../../theme/colors";
 import { formatToCurrencyBRL, formatToDateBRL } from "../../utils";
 import { ContainerGradient } from "../../styled-components/containers";
@@ -6,6 +5,7 @@ import { TransactionItem } from "../../store/transaction/initialState";
 import { useAppSelector } from "../../store/hooks/useAppSelector";
 import { PixKey } from "../../store/account/initialState";
 import RefundTransactionButton from "../refund-button";
+import { Title } from "../../styled-components/text";
 
 interface TransactionsProps {
     myTransactions: TransactionItem[];
@@ -41,8 +41,8 @@ export default function Transactions({
 
             {loadMyTransactionsStatus === 'succeeded' && myTransactions && (
                 <div className="overflow-hidden">
-                    <div className="">
-                        <p className="pt-2 font-medium text-xl mb-2" style={{ color: themeColors.color }}>Minhas Transações</p>
+                    <div>
+                        <Title>Minhas Transações</Title>
                         {myTransactions.length > 0 ? (
                             <>
                                 {myTransactions.map(transaction => {
@@ -79,8 +79,8 @@ export default function Transactions({
                                                     )}
                                                     {account.id === transaction.accountId && transaction.type === 'refund' && (
                                                         <>
-                                                            <p className="font-semibold" style={{ color: themeColors.success }}>
-                                                                O destinatário extornou
+                                                            <p className="font-semibold capitalize" style={{ color: themeColors.success }}>
+                                                                {transaction.payeeName} extornou.
                                                             </p>
                                                             <p className="font-bold text-right" style={{ color: themeColors.success }}>
                                                                 <span className="material-icons" style={{ fontSize: '12px' }}>trending_up</span>
@@ -92,7 +92,7 @@ export default function Transactions({
                                                     {isAdd && transaction.type === 'refund' && (
                                                         <>
                                                             <p className="font-semibold" style={{ color: themeColors.error }}>
-                                                                Você extornou
+                                                                Você extornou para {transaction.payerName}.
                                                             </p>
                                                             <p className="font-bold text-right" style={{ color: themeColors.error }}>
                                                                 <span className="material-icons" style={{ fontSize: '12px' }}>trending_down</span>
@@ -104,7 +104,7 @@ export default function Transactions({
                                                     {isAdd && transaction.type === 'transaction' && (
                                                         <>
                                                             <p className="font-semibold" style={{ color: themeColors.success }}>
-                                                                Recebido
+                                                                Recebido de {transaction.payerName}.
                                                             </p>
                                                             <p className="font-bold text-right" style={{ color: themeColors.success }}>
                                                                 <span className="material-icons" style={{ fontSize: '12px' }}>trending_up</span>
@@ -116,7 +116,7 @@ export default function Transactions({
                                                     {!isAdd && transaction.type === 'transaction' && (
                                                         <>
                                                             <p className="font-semibold" style={{ color: themeColors.error }}>
-                                                                Transferência
+                                                                Transferência para {transaction.payeeName}.
                                                             </p>
                                                             <p className="font-bold text-right" style={{ color: themeColors.error }}>
                                                                 <span className="material-icons" style={{ fontSize: '12px' }}>trending_down</span>

@@ -1,9 +1,8 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
-import Input from '../../shared/trasaction/input';
+import Input from '../../components/trasaction/input';
 import { useAppDispatch } from '../../store/hooks/useAppDispatch';
 import { signUpAsync } from '../../store/user/thunks';
 import { useNavigate } from 'react-router-dom';
-import { setSignedIn } from '../../store/user/actions';
 
 // Função para validar email
 const validateEmail = (email: string): boolean => {
@@ -41,7 +40,6 @@ const SignUp: React.FC = () => {
         cpf: null,
         name: null,
     });
-    const [success, setSuccess] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -90,7 +88,6 @@ const SignUp: React.FC = () => {
         const cleanedCpf = cpf.replace(/\D/g, '');
 
         dispatch(signUpAsync({ username: email, password, name, cpf: cleanedCpf })).then((data) => {
-            console.log(data)
             navigate('/');
         }).catch((e) => {
             console.log(e);
@@ -144,13 +141,15 @@ const SignUp: React.FC = () => {
                         value={password}
                         handleChange={handlePasswordChange}
                     />
-                    <button
-                        onClick={handleNextStep}
-                        disabled={!!errors.email || !!errors.password}
-                        className={`py-2 px-4 mt-4 font-bold text-white rounded transition-colors duration-300 ${!!errors.email || !!errors.password ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-400 hover:bg-orange-500'}`}
-                    >
-                        Próximo
-                    </button>
+                    <div className="flex flex-row justify-center items-center">
+                        <button
+                            onClick={handleNextStep}
+                            disabled={!!errors.email || !!errors.password}
+                            className={`py-2 px-4 mt-4 font-bold text-white rounded transition-colors duration-300 ${!!errors.email || !!errors.password ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-400 hover:bg-orange-500'}`}
+                        >
+                            Próximo
+                        </button>
+                    </div>
                 </div>
             )}
             {step === 2 && (
@@ -186,7 +185,6 @@ const SignUp: React.FC = () => {
                     </div>
                 </div>
             )}
-            {success && <div className="p-2 bg-green-600 font-bold text-green-50 mt-2">{success}</div>}
         </div>
     );
 };

@@ -82,7 +82,6 @@ export const loadMyTransactions = createAsyncThunk(
         const { account } = getState()?.account;
 
         try {
-            console.log("loadMyTransactions: ", account)
             const response = await httpClient.request(`transaction/all/${account.id}`, {
                 headers: {
                     'Content-Type': 'application/json',

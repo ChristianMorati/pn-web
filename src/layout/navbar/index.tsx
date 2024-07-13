@@ -1,23 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Importando o Link do React Router DOM
+import { Link } from 'react-router-dom';
 import Logo from '../logo';
 import { useAppDispatch } from '../../store/hooks/useAppDispatch';
 import { logOff } from '../../store/user/actions';
+import { useAppSelector } from '../../store/hooks/useAppSelector';
+import { themeColors } from '../../theme/colors';
 
 export default function Navbar() {
     const dispatch = useAppDispatch();
+    const { userInfo } = useAppSelector(store => store.user);
     return (
-        <nav className="flex justify-between items-center bg-gray-800 text-white p-4">
-            {/* Links à esquerda */}
+        <nav className="flex justify-between items-center text-white p-4" style={{ backgroundColor: themeColors.primary }}>
             <div className="flex items-center space-x-4">
                 <Logo />
             </div>
 
-            {/* Botões à direita */}
             <div className="flex items-center space-x-4">
-                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Login</Link>
-                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Signup</Link>
-                <Link to={"/"} onClick={() => dispatch(logOff())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">Sair</Link>
+                {userInfo.access_token && (
+                    <>
+                        <Link to={"/login"} onClick={() => dispatch(logOff())} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">Sair</Link>
+                    </>
+                )}
             </div>
         </nav>
     );

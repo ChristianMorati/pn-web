@@ -11,7 +11,7 @@ export const transactionReducer = createSlice({
             state.myTransactions.unshift(action.payload);
         },
         changeTypeOfTransactionToRefund(state, action: PayloadAction<TransactionItem>) {
-            const refundedTransactionIndex = state.myTransactions.findIndex(item => item.id == action.payload.id);
+            const refundedTransactionIndex = state.myTransactions.findIndex(item => item.id === action.payload.id);
             state.myTransactions[refundedTransactionIndex].type = "refund";
         },
     },

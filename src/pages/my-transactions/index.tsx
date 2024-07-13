@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
-import Transactions from "../../shared/transactions";
+import Transactions from "../../components/transactions";
 import { useAppDispatch } from "../../store/hooks/useAppDispatch";
 import { loadMyTransactions } from "../../store/transaction/thunks";
 import { useAppSelector } from "../../store/hooks/useAppSelector";
-import { loadMyAccountData } from "../../store/account/thunks";
 import { ContainerGradient } from "../../styled-components/containers";
 
 export default function MyTransactionsScreen() {
     const dispatch = useAppDispatch();
     const { myTransactions, loadMyTransactionsStatus, loadMyTransactionsError } = useAppSelector((store) => store.transaction);
-    const { account } = useAppSelector((store) => store.account);
-
     const [loading, setLoading] = useState(true);
 
-    async function loadApp() {
+    function loadTransactions() {
         try {
-            const transactions = await dispatch(loadMyTransactions());
+            dispatch(loadMyTransactions());
         } catch (error) {
             console.log(error)
         } finally {
@@ -23,13 +20,13 @@ export default function MyTransactionsScreen() {
         }
     }
 
-    useEffect(() => {
-        loadApp()
-    }, []);
-
     function handleReload() {
         dispatch(loadMyTransactions());
     }
+
+    useEffect(() => {
+        loadTransactions()
+    }, []);
 
     return (
         <div className='p-2 flex-col gap-2 w-[100%] md:w-[90%] lg:w-[70%] mx-auto' style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

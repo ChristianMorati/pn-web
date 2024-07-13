@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ContainerGradient } from "../styled-components/containers";
 import Login from "./login";
 import SignUp from "./signup";
-
 
 export default function AuthScreen() {
 

@@ -1,14 +1,12 @@
 import styled from "styled-components";
-
-const primary = '#1e293b';
-const secondary = '#334155';
+import {themeColors} from "../../theme/colors";
 
 export const ContainerGradient = styled.div<{ lightTop?: boolean }>`
   border-radius: .5rem;
   padding: 1rem;
   ${props => props.lightTop ? `
-    background: linear-gradient(${secondary}, ${primary});
-  ` : 
-    `background: linear-gradient(${primary}, ${secondary});
+    background: linear-gradient(${themeColors.secondary}, ${themeColors.primary});
+  ` :
+    `background: linear-gradient(${themeColors.primary}, ${themeColors.secondary});
   `}
 `;

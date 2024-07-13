@@ -1,64 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { setSignedIn, setUserInfo } from "../store/user/actions";
 import { useAppSelector } from "../store/hooks/useAppSelector";
-import { useAppDispatch } from "../store/hooks/useAppDispatch";
-import { updateTokens } from "../services/jwt";
-import AuthRouter from "./AuthRouter";
-import AuthScreen from "../pages/LoginScreen";
-import NonAuthRouter from "./NonAuthRouter";
 import './index.css';
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import Navbar from "../layout/navbar";
+import HomeScreen from "../pages/home";
+import MyTransactionsScreen from "../pages/my-transactions";
+import AuthScreen from "../pages/LoginScreen";
+import NotFoundScreen from "../pages/not-founded";
 
 export default function RootNavigator() {
-    const [isLoading, setIsLoading] = useState(true);
     const { signedIn } = useAppSelector(store => store.user);
-    const dispatch = useAppDispatch();
-
-    const checkIfIsAuthtenticated = async () => {
-        try {
-            const user = localStorage.getItem("@User");
-            if (!user) {
-                throw new Error("Sem dados de Usuário");
-            }
-
-            const userData = JSON.parse(user);
-            if (!userData.access_token) {
-                throw new Error("Access token não encontrado");
-            }
-
-            const tokens = {
-                access_token: userData.access_token,
-                refresh_token: userData.refresh_token,
-            }
-
-            const updatedTokens = await updateTokens(tokens);
-            if (!updatedTokens) {
-                throw new Error("falha ao atualizar tokens");
-            }
-
-            dispatch(setUserInfo(userData));
-            dispatch(setSignedIn(true));
-        } catch (error) {
-            dispatch(setSignedIn(false));
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        checkIfIsAuthtenticated();
-    }, []);
 
     return (
         <>
-            {isLoading ? (
-                <div className="index">
-                    <div className="loader"></div>
-                </div>
-            ) : (
-                <>
-                    {signedIn ? <AuthRouter /> : <NonAuthRouter />}
-                </>
-            )}
+            <Router>
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={signedIn ? <HomeScreen /> : <Navigate to="/login" />} />
+                    <Route path="my-transactions" element={signedIn ? <MyTransactionsScreen /> : <Navigate to="/login" />} />
+                    <Route path="/login" element={<AuthScreen />} />
+                    <Route path="*" element={<NotFoundScreen />} />
+                </Routes>
+            </Router>
         </>
     );
-};
+}

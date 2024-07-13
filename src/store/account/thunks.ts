@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { httpClient } from "../../services/http-client";
+import { BASE_URL_API, httpClient } from "../../services/http-client";
+import { store } from "..";
 
 export const loadMyAccountData = createAsyncThunk(
     'account/loadMyAccountData',
@@ -43,8 +44,6 @@ export const findUserByPixKey = createAsyncThunk(
     async ({ pixKey }: findUserByPixKeyParams) => {
         try {
             const token = localStorage.getItem('TOKEN');
-            // const userId = localStorage.getItem('@user');
-            const pixKey = ""
             const response = await httpClient.request(`user/pixKey/${pixKey}`, {
                 method: "GET",
                 headers: {
@@ -56,44 +55,44 @@ export const findUserByPixKey = createAsyncThunk(
                 throw new Error('Failed to load user data');
             }
 
-            console.log(response.data)
-
             return response.data;
         } catch (error) {
-            console.log('error')
             return Promise.reject(error);
         }
     }
 );
 
+type AddBalanceToMyAccountParams = {
+    amount: number;
+};
 
-export const addBalanceToMyAccount = createAsyncThunk(
+export const addBalanceToMyAccount = createAsyncThunk<
+    any,
+    AddBalanceToMyAccountParams
+>(
     'account/deposit',
-    async (amount: number, { getState }: any) => {
-        const { account } = getState().account;
-
+    async ({ amount }, { rejectWithValue }) => {
+        const { account } = store.getState().account;
         try {
-            const token = localStorage.getItem('TOKEN');
-            const response = await httpClient.request(`account/deposit`, {
-                method: "POST",
+            const response = await fetch(BASE_URL_API + 'account/deposit', {
+                method: 'POST',
                 body: JSON.stringify({
                     accountId: account.id,
-                    amount: amount
+                    amount
                 }),
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (!response) {
-                throw new Error('Failed to load user data');
+            if (!response.ok) {
+                throw new Error('Falha ao adicionar saldo na conta');
             }
 
-            return response;
+            const data = await response.json();
+            return data;
         } catch (error) {
-            console.error('Error:', error);
-            return Promise.reject(error);
+            return rejectWithValue({ message: "Falha ao adicionar saldo na conta" });
         }
     }
 );

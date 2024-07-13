@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { BASE_URL } from "../../services/http-client";
+import { BASE_URL_API } from "../../services/http-client";
 
 type UserLogin = {
     username: string,
@@ -15,22 +15,26 @@ type UserSignUp = {
 
 export const loginAsync = createAsyncThunk(
     "user/login",
-    async (formData: UserLogin) => {
-        const response = await fetch(BASE_URL + 'auth/signin', {
-            method: "POST",
-            body: JSON.stringify(formData),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+    async (formData: UserLogin, { rejectWithValue }) => {
+        try {
+            const response = await fetch(BASE_URL_API + 'auth/signin', {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        const data = await response.json();
+            if (!response.ok) {
+                const error = await response.json();
+                return rejectWithValue(error);
+            }
 
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to login');
+            const user = await response.json();
+            return user;
+        } catch (e) {
+            return rejectWithValue(e);
         }
-
-        return data;
     }
 );
 
@@ -38,7 +42,7 @@ export const signUpAsync = createAsyncThunk(
     "user/signup",
     async (formData: UserSignUp, { rejectWithValue }) => {
         try {
-            const response = await fetch(BASE_URL + 'auth/signup', {
+            const response = await fetch(BASE_URL_API + 'auth/signup', {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {

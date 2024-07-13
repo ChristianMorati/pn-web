@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { withdraw } from "../../store/account/actions";
 import { useAppDispatch } from "../../store/hooks/useAppDispatch";
 import { TransactionItem } from "../../store/transaction/initialState";

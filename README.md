@@ -27,3 +27,10 @@ You will also see any lint errors in the console.
 <li>Instale os pacotes deste repositŕio e inicie o app react</li>
 <li>Logue com um usuaŕio de teste, email: <span style="color: red;">usuario@gmail.com</span> senha: <span style="color: red;">usuario</span></li>
 </ul>
+
+### E também tem um Expo App + React Native
+
+Pode ser obtido em: (https://https://github.com/ChristianMorati/pn-app).
+
+
+
